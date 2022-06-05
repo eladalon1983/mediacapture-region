@@ -72,15 +72,14 @@
       const broadcastChannel = new BroadcastChannel("region-capture-demo");
       broadcastChannel.onmessage = onBroadcastChannelMessage;
 
-      function onBroadcastChannelMessage(serializedMessage) {
-        const msg = JSON.parse(serializedMessage.data);
-        if (msg.init) {
+      function onBroadcastChannelMessage(msg) {
+        if (msg.data.action == 'init') {
           init();
         }
       }
 
-      function postCropID(cropID) {
-        broadcastChannel.postMessage(JSON.stringify({ cropID: cropID }));
+      function postCropID(cropTarget) {
+        broadcastChannel.postMessage({ action: "cropTarget", cropTarget: cropTarget });
       }
 
       async function init() {

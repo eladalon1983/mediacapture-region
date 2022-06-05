@@ -35,7 +35,7 @@
       const errorMessage = document.getElementById("errorMessage");
       const muteIndicator = document.getElementById("muteIndicator");
       let track;
-      let cropIDs = [];
+      let cropTargets = [];
       let pip;
       let recordedChunks = [];
       let mediaRecorder;
@@ -96,7 +96,7 @@
         video.style = "border: none;";
         if (await MaybeStartCapturing()) {
           video.pause();
-          await track.cropTo(cropIDs[source]);
+          await track.cropTo(cropTargets[source]);
           video.play();
         }
       }
@@ -106,7 +106,7 @@
           // TODO: This should not be hard-coded, just capped to the size of the div.
           video.style = "border: none; width: 500px; height: 500px;";
           video.pause();
-          await track.cropTo("");
+          await track.cropTo(undefined);
           video.play();
         }
       }
@@ -153,13 +153,12 @@
         });
       }
 
-      function onBroadcastChannelMessage(serializedMessage) {
+      function onBroadcastChannelMessage(msg) {
         try {
-          const msg = JSON.parse(serializedMessage.data);
-          if (msg.init) {
+          if (msg.data.action == 'init') {
             init();
-          } else if (msg.cropID) {
-            cropIDs.push(msg.cropID);
+          } else if (msg.data.action == 'cropTarget') {
+            cropTargets.push(msg.data.cropTarget);
           }
         } catch (error) {
           console.error(`${error}`);
